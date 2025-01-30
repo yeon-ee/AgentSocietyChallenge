@@ -164,7 +164,7 @@ def merge_business_data(amazon_meta, goodreads_books, output_file=None):
             for item in amazon_json:
                 f.write(json.dumps(item) + '\n')
 
-def merge_review_data(amazon_reviews, output_file=None):
+def merge_review_data(amazon_reviews, goodreads_reviews, output_file=None):
     """Merge review data from Amazon source."""
     logging.info("Processing review data...")
     
@@ -198,7 +198,7 @@ def merge_review_data(amazon_reviews, output_file=None):
             for item in amazon_json:
                 f.write(json.dumps(item) + '\n')
 
-def create_unified_users(amazon_reviews, output_file=None):
+def create_unified_users(amazon_reviews, goodreads_reviews, output_file=None):
     """Create unified user data from Amazon reviews."""
     logging.info("Processing user data...")
     

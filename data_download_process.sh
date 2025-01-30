@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # 데이터 저장 디렉토리 설정
-RAW_DIR="/data/raw"
+RAW_DIR="/root/AgentSocietyChallenge/data/raw"
 PROCESSED_DIR="/root/AgentSocietyChallenge/data/processed"
+
+# 데이터 디렉토리 생성
+mkdir -p "$RAW_DIR"
 
 # URL 리스트
 urls=(
@@ -26,32 +29,41 @@ urls=(
     "https://datarepo.eng.ucsd.edu/mcauley_group/gdrive/goodreads/byGenre/goodreads_books_poetry.json.gz"
 )
 
-# 데이터 디렉토리 생성
-mkdir -p "$RAW_DIR"
-
 # 다운로드 및 압축 해제
 echo "Starting downloads and extraction..."
 for url in "${urls[@]}"; do
     filename=$(basename "$url")  # URL에서 파일 이름 추출
-    echo "Downloading: $url"
-    wget "$url" -P "$RAW_DIR"
-    
-    if [ $? -ne 0 ]; then
-        echo "Failed to download: $url"
-        exit 1
+    filepath="$RAW_DIR/$filename"
+    extracted_file="${filepath%.gz}"  # .gz 제거한 파일 경로
+
+    # 파일이 이미 다운로드되어 있고 압축 해제까지 되어 있다면 스킵
+    if [[ -f "$extracted_file" ]]; then
+        echo "Skipping (already extracted): $extracted_file"
+        continue
     fi
-    
+
+    # 파일이 존재하지 않으면 다운로드
+    if [[ -f "$filepath" ]]; then
+        echo "File already exists: $filepath (Skipping download)"
+    else
+        echo "Downloading: $url"
+        wget -q "$url" -P "$RAW_DIR"
+        
+        if [ $? -ne 0 ]; then
+            echo "Failed to download: $url"
+            exit 1
+        fi
+    fi
+
     # 압축 해제
     if [[ "$filename" == *.gz ]]; then
-        echo "Extracting: $filename"
-        gunzip "$RAW_DIR/$filename"
-        
+        echo "Extracting: $filepath"
+        gunzip -f "$filepath"
+
         if [ $? -ne 0 ]; then
             echo "Failed to extract: $filename"
             exit 1
         fi
-        
-        echo "Deleting: $filename"
     fi
 done
 
