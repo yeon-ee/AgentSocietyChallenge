@@ -135,7 +135,7 @@ def load_and_process_goodreads_data(input_dir):
     
     return all_books, all_reviews
 
-def merge_business_data(amazon_meta, output_file=None):
+def merge_business_data(amazon_meta, goodreads_books, output_file=None):
     """Merge business data from Amazon source."""
     logging.info("Processing business data...")
     
